@@ -6,6 +6,10 @@ const StockSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  price: {
+    type: String,
+    required: true
+  },
   likes: {
     type: Number,
     required: true,
