@@ -66,7 +66,7 @@ app.get('/api/stock-prices', async (req, res) => {
 
       if(stockDb.price !== closedStock){
         stockDb.price = closedStock;
-        stockDb = stockDb.save();
+        stockDb = await stockDb.save();
         return stockDb
       }
 
