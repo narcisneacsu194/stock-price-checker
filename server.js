@@ -14,6 +14,28 @@ const port = process.env.PORT || 3000;
 const URL = 'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY';
 const API_KEY = 'RYPEH4F02O8I2YDR';
 
+const incrementLiked = async (stockDb, like) => {
+  if(like === "true"){
+    let ipAddress = await ip.v4();
+    let likeOrNot = true;
+
+    stockDb.addresses.forEach((address, index) => {
+      if(address.ip === ipAddress){
+        likeOrNot = false;
+      }
+    });
+
+    if(likeOrNot){
+      stockDb.addresses.push({ ip: ipAddress } );
+      stockDb.likes += 1;
+      return stockDb;
+    }
+  }
+
+  return stockDb;
+}
+
+
 app.use(bodyParser.json());
 app.use(helmet.contentSecurityPolicy({
     directives: {
@@ -60,6 +82,7 @@ app.get('/api/stock-prices', async (req, res) => {
 
       if(!stockDb){
         let newStockDb = new Stock({ stock: symbolUpper, price: closedStock });
+        newStockDb = await incrementLiked(newStockDb, like);
         newStockDb = await newStockDb.save();
         return newStockDb;
       }
@@ -67,8 +90,10 @@ app.get('/api/stock-prices', async (req, res) => {
       if(stockDb.price !== closedStock){
         stockDb.price = closedStock;
         stockDb = await stockDb.save();
-        return stockDb
       }
+
+      stockDb = await incrementLiked(stockDb, like);
+      await stockDb.save();
 
       return stockDb;
   });
