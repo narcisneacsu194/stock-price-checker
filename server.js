@@ -33,40 +33,36 @@ app.get('/api/stock-prices', async (req, res) => {
     stock = [stock];
   }
 
-  let finalStock = {};  
-
-  let metadataObj;
-  let symbol;
-  let symbolUpper;
-  let timeSeries;
-  let yesterday;
-  let firstObj;
   let closedStock;
-  let newStockDb;
+  let symbolUpper;
 
   const promises = stock.map((stockIter) => {
     return axios.get(`${URL}&symbol=${stockIter}&apikey=${API_KEY}`).then((response) => {
 
-      if(!response.data['Meta Data']){
+      if(response.data['Note']){
         return { note: response.data['Note'] };
       }
 
-      metadataObj = response.data['Meta Data'];
-      symbol = metadataObj['2. Symbol'];
+      if(response.data['Error Message']){
+        return { error: `Symbol '${stockIter}' doesn't belong to any company. Please try again!` };
+      }
+
+      const metadataObj = response.data['Meta Data'];
+      const symbol = metadataObj['2. Symbol'];
       symbolUpper = symbol.toUpperCase();
-      timeSeries = response.data['Time Series (Daily)'];
-      yesterday = moment().subtract(1, 'days').format('YYYY-MM-DD');
-      firstObj = timeSeries[yesterday];
+      const timeSeries = response.data['Time Series (Daily)'];
+      const yesterday = moment().subtract(1, 'days').format('YYYY-MM-DD');
+      const firstObj = timeSeries[yesterday];
 
       closedStock = firstObj['4. close'];
       closedStock = parseFloat(closedStock).toFixed(2);
 
       return Stock.findOne({ stock: symbolUpper });
     }).then((stockDb) => {
-      if(stockDb && stockDb.note)return stockDb;
+      if(stockDb && (stockDb.note || stockDb.error))return stockDb;
 
       if(!stockDb){
-        newStockDb = new Stock({ stock: symbolUpper, price: closedStock });
+        const newStockDb = new Stock({ stock: symbolUpper, price: closedStock });
         return newStockDb.save();
       }
 
@@ -87,9 +83,19 @@ app.get('/api/stock-prices', async (req, res) => {
       return res.status(400).send(results[0].note);
     }
     
-    if(results[1].note){
+    if(results.length === 2 && results[1].note){
       return res.status(400).send(results[1].note);
     }
+
+    if(results[0].error){
+      return res.status(400).send(results[0].error);
+    }
+
+    if(results.length === 2 && results[1].error){
+      return res.status(400).send(results[1].error);
+    }
+
+    let finalStock;
 
     if(results.length === 1){
       finalStock = {
@@ -114,7 +120,7 @@ app.get('/api/stock-prices', async (req, res) => {
            }
          ]
        };
-      }
+       }
     
     return res.send(finalStock);
   });
