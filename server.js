@@ -58,10 +58,8 @@ app.get('/api/stock-prices', async (req, res) => {
 
       if(stockDb && (stockDb.note || stockDb.error))return stockDb;
 
-      let newStockDb;
-
       if(!stockDb){
-        newStockDb = new Stock({ stock: symbolUpper, price: closedStock });
+        let newStockDb = new Stock({ stock: symbolUpper, price: closedStock });
         newStockDb = await newStockDb.save();
         return newStockDb;
       }
