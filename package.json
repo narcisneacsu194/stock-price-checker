@@ -18,5 +18,11 @@
     "mongodb": "^2.2.5",
     "mongoose": "^5.3.13",
     "public-ip": "^2.4.0"
+  },
+  "devDependencies": {
+    "expect": "^21.1.0",
+    "mocha": "^3.0.2",
+    "nyc": "^13.1.0",
+    "supertest": "^2.0.0"
   }
 }

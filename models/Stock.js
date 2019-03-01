@@ -15,6 +15,7 @@ const StockSchema = mongoose.Schema({
     required: true,
     default: 0
   },
+  stockDate: String,
   addresses: [IpAddressSchema]
 });
 
