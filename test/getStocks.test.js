@@ -12,14 +12,14 @@ describe('GET /api/stock-prices', () => {
   it('should successfully get information about an existing stock in the database', (done) => {
     const dbStock = {
       stock: stocks[0].stock,
-      likes: stocks[0].likes
+      likes: stocks[0].likes,
     };
 
     request(app)
       .get('/api/stock-prices?stock=fb')
       .expect(200)
       .expect((res) => {
-        const body = res.body;
+        const { body } = res;
         expect(body.stockData.stock).toBe(dbStock.stock);
         expect(body.stockData.likes).toBe(dbStock.likes);
         expect(body.stockData.price).toBeTruthy();
@@ -31,24 +31,24 @@ describe('GET /api/stock-prices', () => {
     const date = moment().subtract(1, 'days').format('YYYY-MM-DD');
     const dbStock = {
       stock: stocks[1].stock,
-      likes: stocks[1].likes
+      likes: stocks[1].likes,
     };
 
     request(app)
       .get('/api/stock-prices?stock=goog')
       .expect(200)
       .expect((res) => {
-        const body = res.body;
+        const { body } = res;
         expect(body.stockData.stock).toBe(dbStock.stock);
         expect(body.stockData.price).toBeTruthy();
         expect(body.stockData.likes).toBe(dbStock.likes);
       })
       .end((err) => {
-        if(err){
+        if (err) {
           return done(err);
         }
 
-        Stock.findOne({ stock: 'GOOG' }).then((stock) => {
+        return Stock.findOne({ stock: 'GOOG' }).then((stock) => {
           expect(stock.likes).toBe(0);
           expect(stock.stock).toBe('GOOG');
           expect(stock.price).toBeTruthy();
@@ -63,30 +63,30 @@ describe('GET /api/stock-prices', () => {
     const date = moment().subtract(1, 'days').format('YYYY-MM-DD');
     const stock = {
       stock: 'AMZN',
-      likes: 0
+      likes: 0,
     };
 
     request(app)
       .get('/api/stock-prices?stock=amzn')
       .expect(200)
       .expect((res) => {
-        const body = res.body;
+        const { body } = res;
         expect(body.stockData.stock).toBe(stock.stock);
         expect(body.stockData.likes).toBe(stock.likes);
         expect(body.stockData.price).toBeTruthy();
       })
       .end((err) => {
-        if(err){
+        if (err) {
           return done(err);
         }
 
-        Stock.findOne({ stock: 'AMZN' }).then((stock) => {
-          expect(stock).toBeTruthy();
-          expect(stock.likes).toBe(0);
-          expect(stock.stock).toBe('AMZN');
-          expect(stock.price).toBeTruthy();
-          expect(stock.stockDate).toBe(date);
-          expect(stock.addresses.length).toBe(0);
+        return Stock.findOne({ stock: 'AMZN' }).then((stockDb) => {
+          expect(stockDb).toBeTruthy();
+          expect(stockDb.likes).toBe(0);
+          expect(stockDb.stock).toBe('AMZN');
+          expect(stockDb.price).toBeTruthy();
+          expect(stockDb.stockDate).toBe(date);
+          expect(stockDb.addresses.length).toBe(0);
           done();
         }).catch(error => done(error));
       });
@@ -96,47 +96,47 @@ describe('GET /api/stock-prices', () => {
     const date = moment().subtract(1, 'days').format('YYYY-MM-DD');
     const dbStock = {
       stock: stocks[0].stock,
-      likes: stocks[0].likes
+      likes: stocks[0].likes,
     };
 
     request(app)
       .get('/api/stock-prices?stock=fb&like=true')
       .expect(200)
       .expect((res) => {
-        const body = res.body;
+        const { body } = res.body;
         expect(body.stockData.stock).toBe(dbStock.stock);
         expect(body.stockData.likes).toBe(1);
         expect(body.stockData.price).toBeTruthy();
       })
       .end(() => {
         request(app)
-         .get('/api/stock-prices?stock=fb&like=true')
-         .expect(200)
-         .expect((res) => {
-           const body = res.body;
-           expect(body.stockData.stock).toBe(dbStock.stock);
-           expect(body.stockData.likes).toBe(1);
-           expect(body.stockData.price).toBeTruthy();
-         })
-         .end((err) => {
-          if(err){
-            return done(err);
-          }
+          .get('/api/stock-prices?stock=fb&like=true')
+          .expect(200)
+          .expect((res) => {
+            const { body } = res;
+            expect(body.stockData.stock).toBe(dbStock.stock);
+            expect(body.stockData.likes).toBe(1);
+            expect(body.stockData.price).toBeTruthy();
+          })
+          .end((err) => {
+            if (err) {
+              return done(err);
+            }
 
-          Stock.findOne({ stock: 'FB'}).then((stock) => {
-            const isPublicIp = ip.isPublic(stock.addresses[0].ip);
-            const isV4Format = ip.isV4Format(stock.addresses[0].ip);
-            expect(stock).toBeTruthy();
-            expect(stock.likes).toBe(1);
-            expect(stock.stock).toBe('FB');
-            expect(stock.price).toBeTruthy();
-            expect(stock.stockDate).toBe(date);
-            expect(stock.addresses.length).toBe(1);
-            expect(isPublicIp).toBeTruthy();
-            expect(isV4Format).toBeTruthy();
-            done();
-          }).catch(error => done(error));
-         });
+            return Stock.findOne({ stock: 'FB' }).then((stock) => {
+              const isPublicIp = ip.isPublic(stock.addresses[0].ip);
+              const isV4Format = ip.isV4Format(stock.addresses[0].ip);
+              expect(stock).toBeTruthy();
+              expect(stock.likes).toBe(1);
+              expect(stock.stock).toBe('FB');
+              expect(stock.price).toBeTruthy();
+              expect(stock.stockDate).toBe(date);
+              expect(stock.addresses.length).toBe(1);
+              expect(isPublicIp).toBeTruthy();
+              expect(isV4Format).toBeTruthy();
+              done();
+            }).catch(error => done(error));
+          });
       });
   });
 

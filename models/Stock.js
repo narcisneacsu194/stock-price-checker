@@ -8,15 +8,15 @@ const StockSchema = mongoose.Schema({
   },
   price: {
     type: String,
-    required: true
+    required: true,
   },
   likes: {
     type: Number,
     required: true,
-    default: 0
+    default: 0,
   },
   stockDate: String,
-  addresses: [IpAddressSchema]
+  addresses: [IpAddressSchema],
 });
 
 const Stock = mongoose.model('Stock', StockSchema);
