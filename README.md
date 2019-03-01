@@ -118,15 +118,15 @@ on the 28th of February 2019).
 
    - If the user doesn't provide any query parameter with the name *stock*, then the 
    following message will be returned, with a status code of 400:
-   **You need to provide a stock query param (i.e "goog")**
+   **"You need to provide a stock query param (i.e "goog")"**
 
    - If one or both of the provided *stock* query parameters contain a symbol that does not belong to any company from the stock market, then the following message 
    will be returned to the user, with a status code of 400:
-   **Symbol 'msff' doesn't belong to any company. Please try again!**. The "msff" symbol is just an example.
+   **"Symbol 'msff' doesn't belong to any company. Please try again!"**. The "msff" symbol is just an example.
 
    - One thing to be mentioned is that the microservice uses a free version of the *Alpha Vantage* Stock API. So you can only 
    get a maximum of 5 different stock prices per minute. If the 
-   user of the microservice tries to get more than that in a minute, the following message will be returned: **Thank you for using Alpha Vantage! Our standard API call frequency is 5 calls per minute and 500 calls per day. Please visit https://www.alphavantage.co/premium/ if you would like to target a higher API call frequency.**
+   user of the microservice tries to get more than that in a minute, the following message will be returned: **"Thank you for using Alpha Vantage! Our standard API call frequency is 5 calls per minute and 500 calls per day. Please visit https://www.alphavantage.co/premium/ if you would like to target a higher API call frequency."**
 
 
 ## Getting Started
