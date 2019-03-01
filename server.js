@@ -86,6 +86,7 @@ app.get('/api/stock-prices', async (req, res) => {
       }
 
       stockDb.price = closedStock;
+      stockDb.stockDate = yesterday;
       stockDb = await incrementLiked(stockDb, like);
       await stockDb.save();
 
